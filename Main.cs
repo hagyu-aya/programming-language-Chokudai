@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,7 +20,7 @@ namespace Chokudai
             var commands = new List<string>();
             while (sr.Peek() > -1)
             {
-                var tmp = sr.ReadLine().Split('�@');
+                var tmp = sr.ReadLine().Split('　');
                 foreach (var s in tmp)
                 {
                     commands.Add(s);
