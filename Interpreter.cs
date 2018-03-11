@@ -16,7 +16,12 @@ namespace Chokudai
             vars = new Dictionary<string, dynamic>();
             funcs = new Dictionary<string, Function>();
             input_que = new Queue<string>();
-            
+
+            funcs.Add("ちょくちょくちょくちょく", new PrimitiveFunction(2, a => a[0] + a[1])); // 加算
+            funcs.Add("ちょくちょくちょくだい", new PrimitiveFunction(2, a => a[0] - a[1])); // 減算
+            funcs.Add("ちょくちょくだいちょく", new PrimitiveFunction(2, a => a[0] * a[1])); // 乗算
+            funcs.Add("ちょくちょくだいだい", new PrimitiveFunction(2, a => a[0] / a[1])); // 除算
+            funcs.Add("ちょくちょくだいだいだい", new PrimitiveFunction(2, a => a[0] % a[1])); // 余剰演算
         }
 
         // 関数を定義する
