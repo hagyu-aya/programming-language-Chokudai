@@ -199,6 +199,29 @@ namespace Chokudai
                     int index = GetVal(ref now_index);
                     return list[index];
                 }
+                else if(command == "ちょくだいだいちょく")
+                {
+                    ++now_index;
+                    string s = commands[now_index++];
+                    int[] res = new int[4];
+                    int t = 0;
+                    for(int i = 0; i < 4; ++i)
+                    { 
+                        if (s[t] == 'ち')
+                        {
+                            res[i] = 1;
+                            t += 3;
+                        }
+                        else if(s[t] == 'だ')
+                        {
+                            res[i] = 0;
+                            t += 2;
+                        }
+                    }
+                    int a = BoolToInt(!EqualToZero(GetVal(ref now_index)));
+                    int b = BoolToInt(!EqualToZero(GetVal(ref now_index)));
+                    return res[a * 2 + b];
+                }
                 else if (interpreter.funcs.ContainsKey(command)) // 関数呼び出し
                 {
                     now_index++;
@@ -212,6 +235,11 @@ namespace Chokudai
                 if (val is int || val is char) return val == 0;
                 if (val is string) return val == "";
                 return val.Count == 0;
+            }
+
+            int BoolToInt(bool a)
+            {
+                return a ? 1 : 0;
             }
 
 			// 関数呼び出し
