@@ -23,7 +23,7 @@ namespace Chokudai
                 var tmp = sr.ReadLine().Split('　');
                 foreach (var s in tmp)
                 {
-                    commands.Add(s);
+                    if(s != "") commands.Add(s);
                 }
             }
 

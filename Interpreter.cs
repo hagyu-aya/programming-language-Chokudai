@@ -22,6 +22,8 @@ namespace Chokudai
             funcs.Add("ちょくちょくだいちょく", new PrimitiveFunction(2, a => a[0] * a[1])); // 乗算
             funcs.Add("ちょくちょくだいだい", new PrimitiveFunction(2, a => a[0] / a[1])); // 除算
             funcs.Add("ちょくちょくだいだいだい", new PrimitiveFunction(2, a => a[0] % a[1])); // 余剰演算
+            funcs.Add("だいだいだいだいだい", new PrimitiveFunction(2, a => BoolToInt(a[0] > a[1]))); // 大なり
+            funcs.Add("だいだいだいだいちょく", new PrimitiveFunction(2, a => BoolToInt(a[0] == a[1]))); // イコール
         }
 
         // 関数を定義する
@@ -45,7 +47,13 @@ namespace Chokudai
             }
             return input_que.Dequeue();
         }
-        
+
+        // bool型をint型に変換
+        static public int BoolToInt(bool a)
+        {
+            return a ? 1 : 0;
+        }
+
         public void Run()
         { 
             int now_index = 0;

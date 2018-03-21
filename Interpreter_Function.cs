@@ -218,8 +218,8 @@ namespace Chokudai
                             t += 2;
                         }
                     }
-                    int a = BoolToInt(!EqualToZero(GetVal(ref now_index)));
-                    int b = BoolToInt(!EqualToZero(GetVal(ref now_index)));
+                    int a = Interpreter.BoolToInt(!EqualToZero(GetVal(ref now_index)));
+                    int b = Interpreter.BoolToInt(!EqualToZero(GetVal(ref now_index)));
                     return res[a * 2 + b];
                 }
                 else if (interpreter.funcs.ContainsKey(command)) // 関数呼び出し
@@ -230,6 +230,7 @@ namespace Chokudai
                 else return vars[commands[now_index++]];
             }
 
+
             bool EqualToZero(dynamic val)
             {
                 if (val is int || val is char) return val == 0;
@@ -237,10 +238,6 @@ namespace Chokudai
                 return val.Count == 0;
             }
 
-            int BoolToInt(bool a)
-            {
-                return a ? 1 : 0;
-            }
 
 			// 関数呼び出し
 			dynamic CallFunc(string name, ref int now_index)
