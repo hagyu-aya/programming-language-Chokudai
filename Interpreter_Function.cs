@@ -21,14 +21,52 @@ namespace Chokudai
             Interpreter interpreter; // 親er
             List<string> commands; // 命令
             Dictionary<string, dynamic> vars; // 変数名->値
+            Dictionary<int, Tuple<int, int>> ifs; // ifのindex->(else ifのindex, 終了場所のindex)
+            Dictionary<int, int> whiles; // whileのindex->終了場所のindex
 
-			public UserDefinedFunction(Interpreter _interpreter, List<string> _commands)
+            public UserDefinedFunction(Interpreter _interpreter, List<string> _commands)
             {
                 interpreter = _interpreter;
                 commands = _commands;
+                ifs = new Dictionary<int, Tuple<int, int>>();
+                whiles = new Dictionary<int, int>();
 
                 int now_index = 1;
                 arg_num = GetInt(ref now_index);
+
+                now_index += arg_num + 1;
+
+                var if_stack = new Stack<int>();
+                var while_stack = new Stack<int>();
+
+
+                while(now_index < commands.Count)
+                {
+                    string command = commands[now_index];
+                    if(command == "だいだいだいだい")
+                    {
+                        // if_stack.Push(now_index); // TODO: 除っそう
+                    }
+                    else if(command == "だいだいだいちょく")
+                    {
+
+                    }
+                    else if(command == "だいだいちょくだい")
+                    {
+
+                    }
+                    else if(command == "だいだいちょくちょく")
+                    {
+                        while_stack.Push(now_index);
+                    }
+                    else if(command == "だいちょくだいちょく")
+                    {
+                        int begin = while_stack.Pop();
+                        int end = now_index;
+                        whiles.Add(begin, end);
+                    }
+                    now_index++;
+                }
             }
 			
 			// Getxxのnow_indexは終了時、xxを表すコマンドの直後のindexに変更される
@@ -163,9 +201,17 @@ namespace Chokudai
                 }
                 else if (interpreter.funcs.ContainsKey(command)) // 関数呼び出し
                 {
+                    now_index++;
                     return CallFunc(command, ref now_index);
                 }
                 else return vars[commands[now_index++]];
+            }
+
+            bool EqualToZero(dynamic val)
+            {
+                if (val is int || val is char) return val == 0;
+                if (val is string) return val == "";
+                return val.Count == 0;
             }
 
 			// 関数呼び出し
@@ -174,7 +220,6 @@ namespace Chokudai
                 var function = interpreter.funcs[name];
                 int arg_num2 = function.arg_num;
                 dynamic[] args2 = new dynamic[arg_num2];
-                now_index++;
                 for (int i = 0; i < arg_num2; ++i)
                 {
                     args2[i] = GetVal(ref now_index);
@@ -217,6 +262,7 @@ namespace Chokudai
             public override dynamic Run(dynamic[] args)
             {
                 vars = new Dictionary<string, dynamic>();
+                var while_stack = new Stack<int>();
                 int now_index = 3;
 
                 // 引数を変数リストに格納
@@ -236,6 +282,20 @@ namespace Chokudai
                         string name = commands[now_index];
                         now_index++;
                         SetVar(name, GetVal(ref now_index));
+                    }
+                    else if (command == "だいだいちょくちょく") // while文始まり
+                    {
+                        int begin = now_index - 1;
+                        if (EqualToZero(GetVal(ref now_index))) now_index = whiles[begin] + 1;
+                        else while_stack.Push(begin);
+                    }
+                    else if(command == "だいちょくだいだい") // break
+                    {
+                        now_index = whiles[while_stack.Pop()];
+                    }
+                    else if (command == "だいちょくだいちょく") // while文終わり
+                    {
+                        now_index = while_stack.Pop();
                     }
                     else if (command == "ちょくだいちょく") // 数字の入力の受け取り
                     {
