@@ -66,7 +66,7 @@ namespace Chokudai
                 {
                     int func_begin = now_index;
                     string func_name = commands[now_index];
-                    while (now_index < commands.Count && commands[now_index] != "ちょくちょくだい") now_index++;
+                    while (now_index < commands.Count && !(commands[now_index] == "ちょくちょくだい" && !(commands[now_index - 1] == "ちょく" || commands[now_index - 1] == "だい"))) now_index++;
                     int func_end = now_index;
                     var func_commands = commands.GetRange(func_begin, func_end - func_begin + 1);
                     DefFunc(func_name, func_commands);

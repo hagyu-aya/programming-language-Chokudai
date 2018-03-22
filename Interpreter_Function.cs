@@ -140,37 +140,21 @@ namespace Chokudai
                 }
                 return s;
             }
-            List<int> GetIntList(ref int now_index)
+            List<dynamic> GetList(ref int now_index)
             {
                 now_index++;
 
-                // 要素数読み込み
                 int len = GetVal(ref now_index);
 
-                // 要素読み込み
-                var list = new List<int>(len);
-                for (int i = 0; i < len; ++i)
-                {
-                    list[i] = GetVal(ref now_index);
-                }
-                return list;
-            }
-            List<string> GetStrList(ref int now_index)
-            {
-                now_index++;
-
-                // 要素数読み込み
-                int len = GetVal(ref now_index);
-
-                // 要素読み込み
-                var list = new List<string>();
-
-                for (int i = 0; i < len; ++i)
+                var list = new List<dynamic>();
+                for(int i = 0; i < len; ++i)
                 {
                     list.Add(GetVal(ref now_index));
                 }
                 return list;
             }
+            
+            // 任意の値を取得する　通常はこれを使う
             dynamic GetVal(ref int now_index)
             {
                 string command = commands[now_index];
@@ -180,7 +164,7 @@ namespace Chokudai
                 }
                 else if (command == "ちょくだい")
                 {
-                    return GetIntList(ref now_index);
+                    return GetList(ref now_index);
                 }
                 else if (command == "だい")
                 {
@@ -190,25 +174,30 @@ namespace Chokudai
                 {
                     return GetStr(ref now_index);
                 }
-                else if (command == "だいだいだい")
-                {
-                    return GetStrList(ref now_index);
-                }
 				else if(command == "だいちょくちょく") // リストの要素数を求める
                 {
                     ++now_index;
                     var list = GetVal(ref now_index);
+                    int rank = GetVal(ref now_index);
+                    for (int i = 0; i < rank; ++i)
+                    {
+                        list = list[GetVal(ref now_index)];
+                    }
                     if (list is string) return list.Length;
-                    else return list.Count;
+                    return list.Count;
                 }
 				else if(command == "だいちょくだい") // ランダムアクセス
                 {
                     ++now_index;
                     var list = GetVal(ref now_index);
-                    int index = GetVal(ref now_index);
-                    return list[index];
+                    int rank = GetVal(ref now_index);
+                    for (int i = 0; i < rank; ++i)
+                    {
+                        list = list[GetVal(ref now_index)];
+                    }
+                    return list;
                 }
-                else if(command == "ちょくだいだいちょく")
+                else if(command == "ちょくだいだいちょく") // 論理演算
                 {
                     ++now_index;
                     string s = commands[now_index++];
@@ -239,14 +228,13 @@ namespace Chokudai
                 else return vars[commands[now_index++]];
             }
 
-
+            // 0と空文字列、空リストを0と見なす
             bool EqualToZero(dynamic val)
             {
                 if (val is int || val is char) return val == 0;
                 if (val is string) return val == "";
                 return val.Count == 0;
             }
-
 
 			// 関数呼び出し
 			dynamic CallFunc(string name, ref int now_index)
@@ -278,19 +266,43 @@ namespace Chokudai
 
             // リストに要素を追加
             // index: 要素を追加する場所(デフォルトで末尾)
-            void ListInsert(string name, dynamic val, int index)
+            void ListInsert(string name, int[] index, dynamic val)
             {
                 var list = vars[name];
-                if (index == -1) list.Add(val);
-                else list.Insert(index, val);
+                int rank = index.Length;
+                for(int i = 0; i < rank - 1; ++i)
+                {
+                    list = list[index[i]];
+                }
+                int id = index[rank - 1];
+                if (id == -1) id = list.Count;
+                list.Insert(id, val);
+            }
+
+            // リストの要素に値を代入
+            void SetListElement(string name, int[] index, dynamic val)
+            {
+                var list = vars[name];
+                int rank = index.Length;
+                for(int i = 0; i < rank; ++i)
+                {
+                    list = list[index[i]];
+                }
+                list = val;
             }
 
             // リストから要素を削除
             // indexはListInsertに同じ
-            void ListDelete(string name, int index = -1)
+            void ListDelete(string name, int[] index)
             {
                 var list = vars[name];
-                list.RemoveAt((index < 0 ? list.Count - 1 : index));
+                int rank = index.Length;
+                for(int i = 0; i < rank - 1; ++i)
+                {
+                    list = list[index[i]];
+                }
+                int id = index[rank - 1];
+                list.RemoveAt((id < 0 ? list.Count - 1 : id));
             }
 
             public override dynamic Run(dynamic[] args)
@@ -306,11 +318,11 @@ namespace Chokudai
                     vars.Add(commands[now_index], args[i]);
                     now_index++;
                 }
-
-                string command = commands[now_index];
-                while (command != "ちょくちょくだい")
+                
+                while (true)
                 {
-                    command = commands[now_index];
+                    string command = commands[now_index];
+                    if (command == "ちょくちょくだい" && !(commands[now_index - 1] == "ちょく" || commands[now_index - 1] == "だい")) break;
                     now_index++;
                     if (command == "ちょくちょく") // 変数の定義or代入
                     {
@@ -377,17 +389,40 @@ namespace Chokudai
                     {
                         Console.Write(GetVal(ref now_index));
                     }
+                    else if(command == "だいだいだい")
+                    {
+                        string name = commands[now_index++];
+                        int rank = GetVal(ref now_index);
+                        var list = vars[name];
+                        for(int i= 0; i < rank - 1; ++i)
+                        {
+                            list = list[GetVal(ref now_index)];
+                        }
+                        int id = GetVal(ref now_index);
+                        var val = GetVal(ref now_index);
+                        list[id] = val;
+                    }
 					else if (command == "だいちょくちょくちょく") // リストへの要素の追加
                     {
                         string name = commands[now_index++];
+                        int rank = GetVal(ref now_index);
+                        int[] index = new int[rank];
+                        for(int i = 0; i < rank; ++i)
+                        {
+                            index[i] = GetVal(ref now_index);
+                        }
                         dynamic element = GetVal(ref now_index);
-                        int index = GetVal(ref now_index);
-                        ListInsert(name, element, index);
+                        ListInsert(name, index, element);
                     }
 					else if (command == "だいちょくちょくだい") // リストの要素の削除
                     {
                         string name = commands[now_index++];
-                        int index = GetVal(ref now_index);
+                        int rank = GetVal(ref now_index);
+                        int[] index = new int[rank];
+                        for (int i = 0; i < rank; ++i)
+                        {
+                            index[i] = GetVal(ref now_index);
+                        }
                         ListDelete(name, index);
                     }
                     else if (command == "ちょくだいだい") // return
