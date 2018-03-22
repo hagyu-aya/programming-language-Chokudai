@@ -36,30 +36,39 @@ namespace Chokudai
 
                 now_index += arg_num + 1;
 
-                var if_stack = new Stack<int>();
+                var if_stack = new Stack<Queue<int>>();
                 var while_stack = new Stack<int>();
-
 
                 while(now_index < commands.Count)
                 {
                     string command = commands[now_index];
-                    if(command == "だいだいだいだい")
+                    if(command == "だいだいだいだい" && commands[now_index - 1] != "ちょく" && commands[now_index - 1] != "だい") // if
                     {
-                        // if_stack.Push(now_index); // TODO: 除っそう
+                        if_stack.Push(new Queue<int>());
+                        if_stack.Peek().Enqueue(now_index);
                     }
-                    else if(command == "だいだいだいちょく")
+                    else if(command == "だいだいだいちょく" && commands[now_index - 1] != "ちょく" && commands[now_index - 1] != "だい") // else if
                     {
-
+                        if_stack.Peek().Enqueue(now_index);
                     }
-                    else if(command == "だいだいちょくだい")
+                    else if(command == "だいだいちょくだい" && commands[now_index - 1] != "ちょく" && commands[now_index - 1] != "だい") // end if
                     {
-
+                        int end = now_index;
+                        var que = if_stack.Peek();
+                        int fst = que.Dequeue();
+                        while(que.Count != 0)
+                        {
+                            int snd = que.Dequeue();
+                            ifs.Add(fst, new Tuple<int, int>(snd, end));
+                            fst = snd;
+                        }
+                        ifs.Add(fst, new Tuple<int, int>(end, end));
                     }
-                    else if(command == "だいだいちょくちょく")
+                    else if(command == "だいだいちょくちょく" && commands[now_index - 1] != "ちょく" && commands[now_index - 1] != "だい") // while
                     {
                         while_stack.Push(now_index);
                     }
-                    else if(command == "だいちょくだいちょく")
+                    else if(command == "だいちょくだいちょく" && commands[now_index - 1] != "ちょく" && commands[now_index - 1] != "だい") // end while
                     {
                         int begin = while_stack.Pop();
                         int end = now_index;
@@ -288,6 +297,7 @@ namespace Chokudai
             {
                 vars = new Dictionary<string, dynamic>();
                 var while_stack = new Stack<int>();
+                var if_stack = new Stack<int>();
                 int now_index = 3;
 
                 // 引数を変数リストに格納
@@ -307,6 +317,29 @@ namespace Chokudai
                         string name = commands[now_index];
                         now_index++;
                         SetVar(name, GetVal(ref now_index));
+                    }
+                    else if(command == "だいだいだいだい") // if始まり
+                    {
+                        int begin = now_index - 1;
+                        if (EqualToZero(GetVal(ref now_index))) now_index = ifs[begin].Item1;
+                        else if_stack.Push(begin);
+                    }
+                    else if(command == "だいだいだいちょく") // else if
+                    {
+                        int begin = now_index - 1;
+                        if(if_stack.Count == 0 || ifs[if_stack.Peek()].Item1 != begin)
+                        {
+                            if (EqualToZero(GetVal(ref now_index))) now_index = ifs[begin].Item1;
+                            else if_stack.Push(begin);
+                        }
+                        else
+                        {
+                            now_index = ifs[if_stack.Pop()].Item2 + 1;
+                        }
+                    }
+                    else if(command == "だいだいちょくだい") // if文終わり
+                    {
+                        if_stack.Pop();
                     }
                     else if (command == "だいだいちょくちょく") // while文始まり
                     {
