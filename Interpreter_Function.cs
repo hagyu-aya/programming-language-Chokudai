@@ -179,6 +179,11 @@ namespace Chokudai
                     now_index++;
                     return new Deque<dynamic>();
                 }
+                else if(command == "だいちょくだいちょくだい") // priority_queue構築
+                {
+                    now_index++;
+                    return new PriorityQueue<long>();
+                }
                 else if (command == "だいちょくちょく") // リストの要素数を求める
                 {
                     ++now_index;
@@ -225,17 +230,29 @@ namespace Chokudai
                     int b = Interpreter.BoolToInt(!EqualToZero(GetVal(ref now_index)));
                     return res[a * 2 + b];
                 }
-                else if (command == "だいだいちょくだいちょく") // pop_front
+                else if (command == "だいだいちょくだいちょく") // deq pop_front
                 {
                     var deq = vars[commands[++now_index]];
                     now_index++;
                     return deq.PopFront();
                 }
-                else if (command == "だいだいちょくちょくだい") // pop_back
+                else if (command == "だいだいちょくちょくだい") // deq pop_back
                 {
                     var deq = vars[commands[++now_index]];
                     now_index++;
                     return deq.PopBack();
+                }
+                else if(command == "だいちょくだいちょくちょく") // pq pop
+                {
+                    var pq = vars[commands[++now_index]];
+                    now_index++;
+                    return pq.Pop();
+                }
+                else if(command == "だいちょくちょくだいちょく") // pq count
+                {
+                    var pq = vars[commands[++now_index]];
+                    now_index++;
+                    return pq.count;
                 }
                 else if(command == "だいちょくだいだいちょく") // deq count
                 {
@@ -474,25 +491,35 @@ namespace Chokudai
                         list.Sort();
                         list.Reverse();
                     }
-                    else if (command == "だいだいちょくだいちょく") // pop_front
+                    else if (command == "だいだいちょくだいちょく") // deq pop_front
                     {
                         var deq = vars[commands[now_index++]];
                         deq.PopFront();
                     }
-                    else if (command == "だいだいちょくちょくだい") // pop_back
+                    else if (command == "だいだいちょくちょくだい") // deq pop_back
                     {
                         var deq = vars[commands[now_index++]];
                         deq.PopBack();
                     }
-                    else if (command == "だいだいちょくちょくちょく") // push_front
+                    else if (command == "だいだいちょくちょくちょく") // deq push_front
                     {
                         var deq = vars[commands[now_index++]];
                         deq.PushFront(GetVal(ref now_index));
                     }
-                    else if (command == "だいちょくだいだいだい") // push_back
+                    else if (command == "だいちょくだいだいだい") // deq push_back
                     {
                         var deq = vars[commands[now_index++]];
                         deq.PushBack(GetVal(ref now_index));
+                    }
+                    else if(command == "だいちょくだいちょくちょく") // pq pop
+                    {
+                        var pq = vars[commands[now_index++]];
+                        pq.Pop();
+                    }
+                    else if(command == "だいちょくちょくだいだい") // pq push
+                    {
+                        var pq = vars[commands[now_index++]];
+                        pq.Push(GetVal(ref now_index));
                     }
                     else if (command == "ちょくだいだい") // return
                     {
