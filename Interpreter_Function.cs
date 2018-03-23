@@ -32,7 +32,7 @@ namespace Chokudai
                 whiles = new Dictionary<int, int>();
 
                 int now_index = 1;
-                arg_num = GetInt(ref now_index);
+                arg_num = (int)GetInt(ref now_index);
 
                 now_index += arg_num + 1;
 
@@ -79,9 +79,9 @@ namespace Chokudai
             }
 
             // Getxxのnow_indexは終了時、xxを表すコマンドの直後のindexに変更される
-            int GetInt(ref int now_index)
+            long GetInt(ref int now_index)
             {
-                int ret = 0;
+                long ret = 0;
                 now_index++;
                 string s = commands[now_index];
                 int i = (s[0] == 'ち' ? 3 : 2);
@@ -271,21 +271,9 @@ namespace Chokudai
             // 0と空文字列、空リストを0と見なす
             bool EqualToZero(dynamic val)
             {
-                if (val is int || val is char) return val == 0;
+                if (val is int || val is long || val is char) return val == 0;
                 if (val is string) return val == "";
                 return val.Count == 0;
-            }
-
-            int Comparison<T>(List<T> x, List<T> y) where T : IComparable
-            {
-                for (int i = 0; i < x.Count && i < y.Count; ++i)
-                {
-                    if (x[i].CompareTo(y[i]) > 0) return 1;
-                    if (x[i].CompareTo(y[i]) > 0) return -1;
-                }
-                if (x.Count > y.Count) return 1;
-                if (x.Count < y.Count) return -1;
-                return 0;
             }
 
             // 関数呼び出し

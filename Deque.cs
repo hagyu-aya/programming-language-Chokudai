@@ -20,7 +20,6 @@ namespace Chokudai
     }
     class Deque<T>
     {
-        List<DequeElement<T>> elements;
         DequeElement<T> front, back;
         public int count { get; private set; }
         public Deque()
