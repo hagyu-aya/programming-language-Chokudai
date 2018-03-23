@@ -8,15 +8,17 @@ namespace Chokudai
 {
     partial class Interpreter
     {
-		// ユーザー定義関数とプリミティブな関数を同等に扱うためのもの
-		abstract class Function
+        // ユーザー定義関数とプリミティブな関数を同等に扱うためのもの
+        abstract class Function
         {
             public int arg_num { get; protected set; }
             public abstract dynamic Run(dynamic[] args);
         }
 
-		// ユーザー定義関数
-		class UserDefinedFunction : Function
+
+
+        // ユーザー定義関数
+        class UserDefinedFunction : Function
         {
             Interpreter interpreter; // 親er
             List<string> commands; // 命令
@@ -39,24 +41,24 @@ namespace Chokudai
                 var if_stack = new Stack<Queue<int>>();
                 var while_stack = new Stack<int>();
 
-                while(now_index < commands.Count)
+                while (now_index < commands.Count)
                 {
                     string command = commands[now_index];
-                    if(command == "だいだいだいだい" && commands[now_index - 1] != "ちょく" && commands[now_index - 1] != "だい") // if
+                    if (command == "だいだいだいだい" && commands[now_index - 1] != "ちょく" && commands[now_index - 1] != "だい") // if
                     {
                         if_stack.Push(new Queue<int>());
                         if_stack.Peek().Enqueue(now_index);
                     }
-                    else if(command == "だいだいだいちょく" && commands[now_index - 1] != "ちょく" && commands[now_index - 1] != "だい") // else if
+                    else if (command == "だいだいだいちょく" && commands[now_index - 1] != "ちょく" && commands[now_index - 1] != "だい") // else if
                     {
                         if_stack.Peek().Enqueue(now_index);
                     }
-                    else if(command == "だいだいちょくだい" && commands[now_index - 1] != "ちょく" && commands[now_index - 1] != "だい") // end if
+                    else if (command == "だいだいちょくだい" && commands[now_index - 1] != "ちょく" && commands[now_index - 1] != "だい") // end if
                     {
                         int end = now_index;
                         var que = if_stack.Peek();
                         int fst = que.Dequeue();
-                        while(que.Count != 0)
+                        while (que.Count != 0)
                         {
                             int snd = que.Dequeue();
                             ifs.Add(fst, new Tuple<int, int>(snd, end));
@@ -64,11 +66,11 @@ namespace Chokudai
                         }
                         ifs.Add(fst, new Tuple<int, int>(end, end));
                     }
-                    else if(command == "だいだいちょくちょく" && commands[now_index - 1] != "ちょく" && commands[now_index - 1] != "だい") // while
+                    else if (command == "だいだいちょくちょく" && commands[now_index - 1] != "ちょく" && commands[now_index - 1] != "だい") // while
                     {
                         while_stack.Push(now_index);
                     }
-                    else if(command == "だいちょくだいちょく" && commands[now_index - 1] != "ちょく" && commands[now_index - 1] != "だい") // end while
+                    else if (command == "だいちょくだいちょく" && commands[now_index - 1] != "ちょく" && commands[now_index - 1] != "だい") // end while
                     {
                         int begin = while_stack.Pop();
                         int end = now_index;
@@ -77,8 +79,8 @@ namespace Chokudai
                     now_index++;
                 }
             }
-			
-			// Getxxのnow_indexは終了時、xxを表すコマンドの直後のindexに変更される
+
+            // Getxxのnow_indexは終了時、xxを表すコマンドの直後のindexに変更される
             int GetInt(ref int now_index)
             {
                 int ret = 0;
@@ -147,13 +149,13 @@ namespace Chokudai
                 int len = GetVal(ref now_index);
 
                 var list = new List<dynamic>();
-                for(int i = 0; i < len; ++i)
+                for (int i = 0; i < len; ++i)
                 {
                     list.Add(GetVal(ref now_index));
                 }
                 return list;
             }
-            
+
             // 任意の値を取得する　通常はこれを使う
             dynamic GetVal(ref int now_index)
             {
@@ -174,7 +176,7 @@ namespace Chokudai
                 {
                     return GetStr(ref now_index);
                 }
-				else if(command == "だいちょくちょく") // リストの要素数を求める
+                else if (command == "だいちょくちょく") // リストの要素数を求める
                 {
                     ++now_index;
                     var list = GetVal(ref now_index);
@@ -186,7 +188,7 @@ namespace Chokudai
                     if (list is string) return list.Length;
                     return list.Count;
                 }
-				else if(command == "だいちょくだい") // ランダムアクセス
+                else if (command == "だいちょくだい") // ランダムアクセス
                 {
                     ++now_index;
                     var list = GetVal(ref now_index);
@@ -197,20 +199,20 @@ namespace Chokudai
                     }
                     return list;
                 }
-                else if(command == "ちょくだいだいちょく") // 論理演算
+                else if (command == "ちょくだいだいちょく") // 論理演算
                 {
                     ++now_index;
                     string s = commands[now_index++];
                     int[] res = new int[4];
                     int t = 0;
-                    for(int i = 0; i < 4; ++i)
-                    { 
+                    for (int i = 0; i < 4; ++i)
+                    {
                         if (s[t] == 'ち')
                         {
                             res[i] = 1;
                             t += 3;
                         }
-                        else if(s[t] == 'だ')
+                        else if (s[t] == 'だ')
                         {
                             res[i] = 0;
                             t += 2;
@@ -236,8 +238,20 @@ namespace Chokudai
                 return val.Count == 0;
             }
 
-			// 関数呼び出し
-			dynamic CallFunc(string name, ref int now_index)
+            int Comparison<T>(List<T> x, List<T> y) where T : IComparable
+            {
+                for (int i = 0; i < x.Count && i < y.Count; ++i)
+                {
+                    if (x[i].CompareTo(y[i]) > 0) return 1;
+                    if (x[i].CompareTo(y[i]) > 0) return -1;
+                }
+                if (x.Count > y.Count) return 1;
+                if (x.Count < y.Count) return -1;
+                return 0;
+            }
+
+            // 関数呼び出し
+            dynamic CallFunc(string name, ref int now_index)
             {
                 var function = interpreter.funcs[name];
                 int arg_num2 = function.arg_num;
@@ -270,7 +284,7 @@ namespace Chokudai
             {
                 var list = vars[name];
                 int rank = index.Length;
-                for(int i = 0; i < rank - 1; ++i)
+                for (int i = 0; i < rank - 1; ++i)
                 {
                     list = list[index[i]];
                 }
@@ -284,7 +298,7 @@ namespace Chokudai
             {
                 var list = vars[name];
                 int rank = index.Length;
-                for(int i = 0; i < rank; ++i)
+                for (int i = 0; i < rank; ++i)
                 {
                     list = list[index[i]];
                 }
@@ -297,7 +311,7 @@ namespace Chokudai
             {
                 var list = vars[name];
                 int rank = index.Length;
-                for(int i = 0; i < rank - 1; ++i)
+                for (int i = 0; i < rank - 1; ++i)
                 {
                     list = list[index[i]];
                 }
@@ -318,7 +332,7 @@ namespace Chokudai
                     vars.Add(commands[now_index], args[i]);
                     now_index++;
                 }
-                
+
                 while (true)
                 {
                     string command = commands[now_index];
@@ -330,16 +344,16 @@ namespace Chokudai
                         now_index++;
                         SetVar(name, GetVal(ref now_index));
                     }
-                    else if(command == "だいだいだいだい") // if始まり
+                    else if (command == "だいだいだいだい") // if始まり
                     {
                         int begin = now_index - 1;
                         if (EqualToZero(GetVal(ref now_index))) now_index = ifs[begin].Item1;
                         else if_stack.Push(begin);
                     }
-                    else if(command == "だいだいだいちょく") // else if
+                    else if (command == "だいだいだいちょく") // else if
                     {
                         int begin = now_index - 1;
-                        if(if_stack.Count == 0 || ifs[if_stack.Peek()].Item1 != begin)
+                        if (if_stack.Count == 0 || ifs[if_stack.Peek()].Item1 != begin)
                         {
                             if (EqualToZero(GetVal(ref now_index))) now_index = ifs[begin].Item1;
                             else if_stack.Push(begin);
@@ -349,7 +363,7 @@ namespace Chokudai
                             now_index = ifs[if_stack.Pop()].Item2 + 1;
                         }
                     }
-                    else if(command == "だいだいちょくだい") // if文終わり
+                    else if (command == "だいだいちょくだい") // if文終わり
                     {
                         if_stack.Pop();
                     }
@@ -359,7 +373,7 @@ namespace Chokudai
                         if (EqualToZero(GetVal(ref now_index))) now_index = whiles[begin] + 1;
                         else while_stack.Push(begin);
                     }
-                    else if(command == "だいちょくだいだい") // break
+                    else if (command == "だいちょくだいだい") // break
                     {
                         now_index = whiles[while_stack.Pop()];
                     }
@@ -389,12 +403,12 @@ namespace Chokudai
                     {
                         Console.Write(GetVal(ref now_index));
                     }
-                    else if(command == "だいだいだい")
+                    else if (command == "だいだいだい")
                     {
                         string name = commands[now_index++];
                         int rank = GetVal(ref now_index);
                         var list = vars[name];
-                        for(int i= 0; i < rank - 1; ++i)
+                        for (int i = 0; i < rank - 1; ++i)
                         {
                             list = list[GetVal(ref now_index)];
                         }
@@ -402,19 +416,19 @@ namespace Chokudai
                         var val = GetVal(ref now_index);
                         list[id] = val;
                     }
-					else if (command == "だいちょくちょくちょく") // リストへの要素の追加
+                    else if (command == "だいちょくちょくちょく") // リストへの要素の追加
                     {
                         string name = commands[now_index++];
                         int rank = GetVal(ref now_index);
                         int[] index = new int[rank];
-                        for(int i = 0; i < rank; ++i)
+                        for (int i = 0; i < rank; ++i)
                         {
                             index[i] = GetVal(ref now_index);
                         }
                         dynamic element = GetVal(ref now_index);
                         ListInsert(name, index, element);
                     }
-					else if (command == "だいちょくちょくだい") // リストの要素の削除
+                    else if (command == "だいちょくちょくだい") // リストの要素の削除
                     {
                         string name = commands[now_index++];
                         int rank = GetVal(ref now_index);
@@ -424,6 +438,20 @@ namespace Chokudai
                             index[i] = GetVal(ref now_index);
                         }
                         ListDelete(name, index);
+                    }
+                    else if (command == "だいだいだいちょくだい")
+                    {
+                        string name = commands[now_index++];
+                        var list = vars[name];
+                        list.Sort();
+                    }
+                    else if (command == "だいだいだいちょくちょく")
+                    {
+                        string name = commands[now_index++];
+                        var list = vars[name];
+
+                        list.Sort();
+                        list.Reverse();
                     }
                     else if (command == "ちょくだいだい") // return
                     {
@@ -450,8 +478,8 @@ namespace Chokudai
             }
         }
 
-		// プリミティブな関数
-		class PrimitiveFunction : Function
+        // プリミティブな関数
+        class PrimitiveFunction : Function
         {
             Func<dynamic[], dynamic> func;
 
