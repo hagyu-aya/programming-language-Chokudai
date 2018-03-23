@@ -15,8 +15,6 @@ namespace Chokudai
             public abstract dynamic Run(dynamic[] args);
         }
 
-
-
         // ユーザー定義関数
         class UserDefinedFunction : Function
         {
@@ -176,6 +174,11 @@ namespace Chokudai
                 {
                     return GetStr(ref now_index);
                 }
+                else if (command == "だいだいちょくだいだい") // deque構築
+                {
+                    now_index++;
+                    return new Deque<dynamic>();
+                }
                 else if (command == "だいちょくちょく") // リストの要素数を求める
                 {
                     ++now_index;
@@ -221,6 +224,24 @@ namespace Chokudai
                     int a = Interpreter.BoolToInt(!EqualToZero(GetVal(ref now_index)));
                     int b = Interpreter.BoolToInt(!EqualToZero(GetVal(ref now_index)));
                     return res[a * 2 + b];
+                }
+                else if (command == "だいだいちょくだいちょく") // pop_front
+                {
+                    var deq = vars[commands[++now_index]];
+                    now_index++;
+                    return deq.PopFront();
+                }
+                else if (command == "だいだいちょくちょくだい") // pop_back
+                {
+                    var deq = vars[commands[++now_index]];
+                    now_index++;
+                    return deq.PopBack();
+                }
+                else if(command == "だいちょくだいだいちょく") // deq count
+                {
+                    var deq = vars[commands[++now_index]];
+                    now_index++;
+                    return deq.count;
                 }
                 else if (interpreter.funcs.ContainsKey(command)) // 関数呼び出し
                 {
@@ -439,19 +460,39 @@ namespace Chokudai
                         }
                         ListDelete(name, index);
                     }
-                    else if (command == "だいだいだいちょくだい")
+                    else if (command == "だいだいだいちょくだい") // 昇順ソート
                     {
                         string name = commands[now_index++];
                         var list = vars[name];
                         list.Sort();
                     }
-                    else if (command == "だいだいだいちょくちょく")
+                    else if (command == "だいだいだいちょくちょく") //降順ソート
                     {
                         string name = commands[now_index++];
                         var list = vars[name];
 
                         list.Sort();
                         list.Reverse();
+                    }
+                    else if (command == "だいだいちょくだいちょく") // pop_front
+                    {
+                        var deq = vars[commands[now_index++]];
+                        deq.PopFront();
+                    }
+                    else if (command == "だいだいちょくちょくだい") // pop_back
+                    {
+                        var deq = vars[commands[now_index++]];
+                        deq.PopBack();
+                    }
+                    else if (command == "だいだいちょくちょくちょく") // push_front
+                    {
+                        var deq = vars[commands[now_index++]];
+                        deq.PushFront(GetVal(ref now_index));
+                    }
+                    else if (command == "だいちょくだいだいだい") // push_back
+                    {
+                        var deq = vars[commands[now_index++]];
+                        deq.PushBack(GetVal(ref now_index));
                     }
                     else if (command == "ちょくだいだい") // return
                     {

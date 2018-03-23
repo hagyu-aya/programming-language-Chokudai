@@ -29,7 +29,6 @@ namespace Chokudai
 
             Interpreter interpreter = new Interpreter(commands);
             interpreter.Run();
-
         }
     }
 }
