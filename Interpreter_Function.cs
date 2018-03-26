@@ -34,7 +34,7 @@ namespace Chokudai
                 int now_index = 1;
                 arg_num = (int)GetInt(ref now_index);
 
-                now_index += arg_num + 1;
+                now_index += arg_num;
 
                 var if_stack = new Stack<Queue<int>>();
                 var while_stack = new Stack<int>();
